@@ -19,7 +19,7 @@
 - (dispatch_queue_t)methodQueue
 {
     return dispatch_get_main_queue();
-}
+} 
 
 + (BOOL)requiresMainQueueSetup
 {
@@ -73,20 +73,22 @@ RCT_EXPORT_METHOD(mail:(NSDictionary *)options
 
             for(NSDictionary *attachment in attachments) {
                 if (attachment[@"path"] && attachment[@"type"]) {
-                    NSString *attachmentPath = [RCTConvert NSString:attachment[@"path"]];
+                    NSString *attachmentUrlString = [RCTConvert NSString:attachment[@"path"]];
                     NSString *attachmentType = [RCTConvert NSString:attachment[@"type"]];
                     NSString *attachmentName = [RCTConvert NSString:attachment[@"name"]];
-
+                    
                     // Set default filename if not specificed
                     if (!attachmentName) {
-                        attachmentName = [[attachmentPath lastPathComponent] stringByDeletingPathExtension];
+                        attachmentName = [[attachmentUrlString lastPathComponent] stringByDeletingPathExtension];
                     }
+                    
+                    NSURL *attachmentUrl = [[NSURLComponents componentsWithString:attachmentUrlString] URL];
                     // Get the resource path and read the file using NSData
-                    NSData *fileData = [NSData dataWithContentsOfFile:attachmentPath];
-
+                    NSData *fileData = [NSData dataWithContentsOfURL:attachmentUrl];
+                    
                     // Determine the MIME type
                     NSString *mimeType;
-
+                    
                     /*
                      * Add additional mime types and PR if necessary. Find the list
                      * of supported formats at http://www.iana.org/assignments/media-types/media-types.xhtml
